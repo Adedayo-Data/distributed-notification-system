@@ -50,3 +50,9 @@ async def consume():
         print("Consuming email.queue...")
         stop_event = asyncio.Event()
         await stop_event.wait() 
+
+
+async def close_connection():
+    global connection
+    if connection:
+        await connection.close()        
