@@ -8,3 +8,4 @@ sendgrid
 pydantic[email]
 dotenv
 redis
+aio_pika

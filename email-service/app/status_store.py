@@ -1,6 +1,7 @@
 import os
 import redis
-
+import dotenv
+dotenv.load_dotenv()
 REDIS_URL = os.getenv("REDIS_URL")
 
 # Connect to Redis

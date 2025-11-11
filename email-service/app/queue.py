@@ -2,7 +2,7 @@ import asyncio
 import os
 import aio_pika
 import httpx
-from .email_sender import send_email
+from .email_sender import send_email_with_retries
 from .models import NotificationMessage
 from .status_store import set_status
 import dotenv
@@ -25,11 +25,20 @@ async def process_message(message: aio_pika.IncomingMessage):
     async with message.process():
         data = NotificationMessage.parse_raw(message.body)
         template = await fetch_template(data.template_id, data.variables)
-        try:
-            await send_email(data.email, template["subject"], template["content"])
+        # Compose rabbitmq_url from your env file or config
+        rabbitmq_url = os.getenv("RABBITMQ_URL")
+        sent = await send_email_with_retries(
+            to_email=data.email,
+            subject=template["subject"],
+            content=template["content"],
+            original_data=data.dict(),       # Pass the original message as dict
+            rabbitmq_url=rabbitmq_url
+        )
+        if sent:
             set_status(data.notification_id, "sent")
-        except Exception as e:
-            set_status(data.notification_id, f"failed: {e}")
+        else:
+            set_status(data.notification_id, "failed: see DLQ")
+
 
 async def consume():
     connection = await aio_pika.connect_robust(os.getenv("RABBITMQ_URL"))
