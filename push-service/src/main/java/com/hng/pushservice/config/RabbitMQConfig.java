@@ -17,10 +17,10 @@ import java.util.Map;
 public class RabbitMQConfig {
 
     public static final String NOTIFICATIONS_DIRECT_EXCHANGE = "notifications.direct";
-    public static final String NOTIFICATIONS_DLX = "notifications.dlx"; // Dead Letter Exchange
+    public static final String NOTIFICATIONS_DLX = "notifications.dlx";
 
     public static final String PUSH_QUEUE = "push.queue";
-    public static final String FAILED_PUSH_QUEUE = "push.queue.dlq"; // Your "failed.queue" for push
+    public static final String FAILED_PUSH_QUEUE = "push.queue.dlq";
 
     public static final String PUSH_ROUTING_KEY = "push";
 
