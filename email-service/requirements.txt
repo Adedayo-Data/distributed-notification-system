@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+aio_pika
+aiosmtplib
+pydantic
+httpx
+sendgrid
+pydantic[email]
+dotenv
