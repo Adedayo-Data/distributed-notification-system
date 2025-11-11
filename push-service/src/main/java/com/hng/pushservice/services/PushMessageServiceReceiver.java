@@ -33,6 +33,13 @@ public class PushMessageServiceReceiver {
             }
 
             String redisKey = pushMessage.getNotificationId();
+            String currentStatus = redisTemplate.opsForValue().get(redisKey);
+
+            if (currentStatus.equalsIgnoreCase("SENT")){
+                logger.warn("NotificationId already processed!");
+                return;
+            }
+
             updateStatus(redisKey, "PROCESSING");
             logger.debug("Updated status in redis for {} to PROCESSING", redisKey);
 
