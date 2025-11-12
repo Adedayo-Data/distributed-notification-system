@@ -9,3 +9,5 @@ pydantic[email]
 dotenv
 redis
 aio_pika
+pytest
+pytest-asyncio
