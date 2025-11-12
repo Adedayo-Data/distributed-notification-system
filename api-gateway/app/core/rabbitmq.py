@@ -198,8 +198,16 @@ class RabbitMQPublisher:
             # Create channel
             self.channel = await self.connection.channel()
             
-            # Setup exchanges (NOT queues - consumers do that)
-            await self._setup_exchanges()
+            # Declare exchange
+            self.exchange = await self.channel.declare_exchange(
+                settings.RABBITMQ_EXCHANGE,
+                type=aio_pika.ExchangeType.DIRECT,
+                # type=settings.RABBITMQ_EXCHANGE_TYPE,
+                durable=True
+            )
+            
+            # Declare queues and bind them to exchange
+            await self._setup_queues()
             
             logger.info("✓ RabbitMQ connection established")
         
