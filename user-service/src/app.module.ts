@@ -22,7 +22,7 @@ import { HealthController } from './health/health.controller';
                         port: parseInt(process.env.DB_PORT || '5432') || 5432,
                         username: process.env.DB_USERNAME || 'postgres',
                         password: process.env.DB_PASSWORD || 'password',
-                        database: process.env.DB_NAME || 'notification_db',
+                        database: process.env.DB_DATABASE || 'notification_db',
                         entities: [User, UserPreference],
                         synchronize: process.env.NODE_ENV !== 'production',
                         logging: process.env.NODE_ENV !== 'production',
