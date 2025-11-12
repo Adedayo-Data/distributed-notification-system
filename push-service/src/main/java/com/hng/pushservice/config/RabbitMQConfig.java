@@ -36,7 +36,6 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue pushQueue() {
-        // configuring the main queue to send its failed messages to the NOTIFICATIONS_DLX
         Map<String, Object> args = new HashMap<>();
         args.put("x-dead-letter-exchange", NOTIFICATIONS_DLX);
         args.put("x-dead-letter-routing-key", PUSH_ROUTING_KEY);

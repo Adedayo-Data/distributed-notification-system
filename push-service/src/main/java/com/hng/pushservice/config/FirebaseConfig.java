@@ -23,7 +23,6 @@ public class FirebaseConfig {
 
     @Bean
     public FirebaseApp initializeFirebaseApp() throws IOException {
-        // Check if the app is already initialized to avoid errors during hot reloads
         if (FirebaseApp.getApps().isEmpty()) {
             InputStream serviceAccount = serviceAccountResource.getInputStream();
 
@@ -36,7 +35,7 @@ public class FirebaseConfig {
             return app;
         } else {
             logger.info("Firebase application already initialized.");
-            return FirebaseApp.getInstance(); // Return the already initialized app
+            return FirebaseApp.getInstance();
         }
     }
 }
