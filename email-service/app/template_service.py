@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 async def fetch_template(template_id: str, variables: dict):
     # Replace with real template service API call
     try:
-        response = await httpx.get(f"http://template-service:8000/templates/{template_id}")
+        response = await httpx.get(f"http://template-service:8085/templates/{template_id}")
         response.raise_for_status()
         data = response.json()
         template_str = data.get("template")
