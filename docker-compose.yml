@@ -108,8 +108,8 @@ services:
     networks:
       - notification-net
     environment:
-      - RABBITMQ_HOST=rabbitmq
-      - REDIS_HOST=redis
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - REDIS_URL=redis://redis:6379/0
       - REDIS_URL=redis://redis:6379
       - USER_SERVICE_URL=http://user-service:3001
       - TEMPLATE_SERVICE_URL=http://template-service:8085
