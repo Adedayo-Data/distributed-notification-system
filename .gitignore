@@ -33,5 +33,7 @@ replay_pid*
 **/__pycache__/
 *.py[cod]
 
+/node_modules
+
 # Ignore environment files
 **/.env*
