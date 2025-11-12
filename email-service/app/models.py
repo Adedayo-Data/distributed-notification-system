@@ -1,9 +1,7 @@
-from pydantic import BaseModel, EmailStr
-from typing import Dict
+from pydantic import BaseModel
 
 class NotificationMessage(BaseModel):
     notification_id: str
-    user_id: str
-    email: EmailStr
+    email: str
     template_id: str
-    variables: Dict[str, str]
+    variables: dict
