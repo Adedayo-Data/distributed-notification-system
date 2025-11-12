@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, UpdateDateColumn } from 'typeorm';
 import { User } from './user.entity';
 
 @Entity('user_preferences')
@@ -18,6 +18,6 @@ export class UserPreference {
         @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', name: 'created_at' })
         created_at: Date;
 
-        @Column({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP', name: 'updated_at' })
+        @UpdateDateColumn({ name: 'updated_at' })
         updated_at: Date;
 }
