@@ -27,7 +27,20 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     logging.info("Starting up: connecting to RabbitMQ...")
-    app.state.rmq_connection = await aio_pika.connect_robust(rabbitmq_url)
+
+    # ADD THIS RETRY LOGIC
+    retries = 20
+    delay = 3
+    for i in range(retries):
+        try:
+            app.state.rmq_connection = await aio_pika.connect_robust(rabbitmq_url)
+            break
+        except Exception as e:
+            logging.warning(f"RabbitMQ not ready ({type(e).__name__}: {e}), retrying in {delay} seconds... ({i+1}/{retries})")
+            await asyncio.sleep(delay)
+    else:
+        raise RuntimeError("Could not connect to RabbitMQ after retries.")
+    
     app.state.consumer_stop_event = asyncio.Event()
     app.state.consumer_task = asyncio.create_task(
         consume(app.state.rmq_connection, app.state.consumer_stop_event)
