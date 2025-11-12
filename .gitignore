@@ -38,3 +38,5 @@ replay_pid*
 # Ignore environment files
 **/.env*
 **/node_modules
+
+**/firebase-service-account.json
