@@ -1,57 +1,124 @@
 version: "3.9"
 
 services:
+  # --- INFRASTRUCTURE ---
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"   
-      - "15672:15672" 
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
+      - "5672:5672"
+      - "15672:15672"
     networks:
       - notification-net
-    healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
 
   redis:
     image: redis:alpine
     container_name: redis
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
     networks:
       - notification-net
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
 
   postgres:
-    image: postgres:15-alpine 
+    image: postgres:15-alpine
     container_name: postgres
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
-    
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    
       - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - notification-net
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+
+  # --- MICROSERVICES ---
+  
+  api-gateway:
+    build: ./api-gateway 
+    container_name: api-gateway
+    ports:
+      - "8000:8000" 
+    networks:
+      - notification-net
+    environment:
+  
+      - SERVICE_PORT=8000
+      - RABBITMQ_HOST=rabbitmq
+      - REDIS_HOST=redis
+      - JWT_SECRET=${JWT_SECRET}
+      - USER_SERVICE_URL=http://user-service:3001 
+    depends_on:
+      - rabbitmq
+      - redis
+      - user-service
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "3001:3001" 
+    networks:
+      - notification-net
+    environment:
+      - SERVICE_PORT=3001
+      - DB_HOST=postgres
+      - DB_USER=admin
+      - DB_PASSWORD=password
+      - DB_NAME=user_db
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - postgres
+
+  template-service:
+    build: ./template-service
+    container_name: template-service
+    ports:
+      - "8085:8085"
+    networks:
+      - notification-net
+    environment:
+      - SERVICE_PORT=8085
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/template_db
+      - SPRING_DATASOURCE_PASSWORD=password
+    depends_on:
+      - postgres
+
+  push-service:
+    build: ./push-service
+    container_name: push-service
+    networks:
+      - notification-net
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_REDIS_HOST=redis
+      - USER_SERVICE_URL=http://user-service:3001
+      - TEMPLATE_SERVICE_URL=http://template-service:8085
+      - STATUS_UPDATE_URL=http://api-gateway:8000/api/v1/push/status/
+    depends_on:
+      - rabbitmq
+      - redis
+      - user-service
+      - template-service
+
+  email-service:
+    build: ./email-service
+    container_name: email-service
+    networks:
+      - notification-net
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - REDIS_HOST=redis
+      - REDIS_URL=redis://redis:6379
+      - USER_SERVICE_URL=http://user-service:3001
+      - TEMPLATE_SERVICE_URL=http://template-service:8085
+      - STATUS_UPDATE_URL=http://api-gateway:8000/api/v1/email/status/
+    depends_on:
+      - rabbitmq
+      - redis
+      - user-service
+      - template-service
 
 networks:
   notification-net:
