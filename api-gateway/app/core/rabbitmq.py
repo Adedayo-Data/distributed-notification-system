@@ -207,7 +207,7 @@ class RabbitMQPublisher:
             )
             
             # Declare queues and bind them to exchange
-            await self._setup_queues()
+            await self._setup_exchanges()
             
             logger.info("✓ RabbitMQ connection established")
         

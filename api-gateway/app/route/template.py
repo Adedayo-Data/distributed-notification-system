@@ -30,12 +30,8 @@ async def create_template(request: TemplateCreationRequest,
     """
     
     # 1. Authorize the token (the required protection)
-<<<<<<< HEAD
-    # The verify_token function is imported from auth_validation
-=======
 
     # logger.info("Verifying admin token for template creation..." + token)
->>>>>>> 0cff68f (refactor: comment out token verification in create_template function)
     # await verify_token(token) 
     
     # 2. Define the URL to the internal Template Service
@@ -52,7 +48,11 @@ async def create_template(request: TemplateCreationRequest,
         response.raise_for_status() # Raise error for 4xx/5xx responses
         
         # 4. Return the response (which should already be a StandardResponse from Template Service)
-        return response.json()
+        return StandardResponse(
+            success=True,
+            data=response.json().get("data"),
+            message="Template created successfully by Template Service" # Add a relevant message
+        )
 
     except httpx.HTTPStatusError as exc:
         logger.error(f"HTTP error calling Template Service: {exc}")
