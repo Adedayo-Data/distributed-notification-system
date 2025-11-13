@@ -1,0 +1,8 @@
+# Ignore the .git folder
+**/.git
+
+# Ignore all node_modules folders
+**/node_modules
+
+
+!**/firebase-service-account.json
