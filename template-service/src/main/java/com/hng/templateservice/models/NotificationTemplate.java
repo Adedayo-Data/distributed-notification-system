@@ -18,7 +18,10 @@ public class NotificationTemplate {
     @Column(unique = true)
     private String templateKey;
 
+    @JsonProperty("subject_template")
     private String subjectTemplate;
+
+    @JsonProperty("subject_template")
     private String bodyTemplate;
 
     private NotificationType type;
