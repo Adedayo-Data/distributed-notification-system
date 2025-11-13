@@ -20,16 +20,23 @@ public class TemplateController {
     private final TemplateService templateService;
     private final TemplateRenderService renderService;
 
-    // create template
     @PostMapping
-    public ResponseEntity<NotificationTemplate> createTemplate(@RequestBody NotificationRequestdto req){
+    public ResponseEntity<ApiResponseDto<NotificationTemplate>> createTemplate(@RequestBody NotificationRequestdto req){
 
         NotificationTemplate template = templateService.createTemplate(req);
+
         if (template == null){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            // Ensure error response is also in the ApiResponseDto format, even on failure
+            ApiResponseDto<Object> errorResponse = new ApiResponseDto<>(
+                    false, "Template creation failed", "Internal service error during save.", null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body((ApiResponseDto)errorResponse);
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(template);
+        // Wrap the successful NotificationTemplate object in the ApiResponseDto
+        ApiResponseDto<NotificationTemplate> response = new ApiResponseDto<>(
+                true, "Template created successfully", template, null);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // Get by Template key
