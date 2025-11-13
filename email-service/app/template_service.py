@@ -1,12 +1,16 @@
 import httpx
 
 import logging
+from dotenv import load_dotenv
+load_dotenv()
 logger = logging.getLogger(__name__)
+
+TEMPLATE_SERVICE_URL = os.getenv("TEMPLATE_SERVICE_URL", "http://template-service:8085")
 
 async def fetch_template(template_id: str, variables: dict):
     # Replace with real template service API call
     try:
-        response = await httpx.get(f"http://template-service:8085/templates/{template_id}")
+        response = await httpx.get(f"{TEMPLATE_SERVICE_URL}/templates/{template_id}")
         response.raise_for_status()
         data = response.json()
         template_str = data.get("template")
