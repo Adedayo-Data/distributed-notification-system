@@ -46,11 +46,12 @@ async def create_template(request: TemplateCreationRequest,
             )
         
         response.raise_for_status() # Raise error for 4xx/5xx responses
+        response_data = response.json()
         
         # 4. Return the response (which should already be a StandardResponse from Template Service)
         return StandardResponse(
             success=True,
-            data=response.json().get("data"),
+            data=response_data,
             message="Template created successfully by Template Service" # Add a relevant message
         )
 
