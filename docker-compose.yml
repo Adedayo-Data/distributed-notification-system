@@ -39,17 +39,41 @@ services:
     build: ./api-gateway 
     container_name: api-gateway
     ports:
-      - "8000:8000" 
+      - "8000:8000"
+    command:
+      uvicorn app.main:app --host 0.0.0.0 --port 8000 
     networks:
       - notification-net
     environment:
-  
-      - SERVICE_PORT=8000
-      - RABBITMQ_HOST=rabbitmq
-      - REDIS_HOST=redis
-      - JWT_SECRET=${JWT_SECRET}
-      - USER_SERVICE_URL=http://user-service:3001 
-      - RABBITMQ_EXCHANGE_TYPE=topic
+    - SERVICE_NAME=api-gateway
+    - ENVIRONMENT=development
+    - DEBUG=True
+    - SERVICE_PORT=8000
+
+    - RABBITMQ_HOST=rabbitmq
+    - RABBITMQ_PORT=5672
+    - RABBITMQ_USER=guest
+    - RABBITMQ_PASS=guest
+    - RABBITMQ_VHOST=/
+    - RABBITMQ_EXCHANGE=notifications
+    - RABBITMQ_EXCHANGE_TYPE=topic
+
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - REDIS_DB=0
+    - REDIS_DECODE_RESPONSES=True
+
+    - JWT_SECRET=${JWT_SECRET}
+    - JWT_ALGORITHM=HS256
+    - JWT_EXPIRATION=3600
+
+    - RATE_LIMIT_REQUESTS=100
+    - RATE_LIMIT_WINDOW=60
+    - NOTIFICATION_STATUS_TTL=3600
+    - IDEMPOTENCY_TTL=3600
+
+    - USER_SERVICE_URL=http://user-service:3001
+
     depends_on:
       - rabbitmq
       - redis
