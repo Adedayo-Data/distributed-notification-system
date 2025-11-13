@@ -30,7 +30,12 @@ async def create_template(request: TemplateCreationRequest,
     """
     
     # 1. Authorize the token (the required protection)
+<<<<<<< HEAD
     # The verify_token function is imported from auth_validation
+=======
+
+    # logger.info("Verifying admin token for template creation..." + token)
+>>>>>>> 0cff68f (refactor: comment out token verification in create_template function)
     # await verify_token(token) 
     
     # 2. Define the URL to the internal Template Service
