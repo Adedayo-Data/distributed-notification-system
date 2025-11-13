@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 from app.utils import rabbitmq_publisher, redis_client, circuit_breaker
 from app.config import settings
 
-from app.route import notification, auth_validation
+from app.route import notification, auth_validation, user, template
 
 app = FastAPI(
     title="API Gateway Service",
@@ -101,6 +101,8 @@ async def health_check():
 
 app.include_router(notification.router)
 app.include_router(auth_validation.router)
+app.include_router(user.router)
+app.include_router(template.router)
 
 
 @app.on_event("startup")
