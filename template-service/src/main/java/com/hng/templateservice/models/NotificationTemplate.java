@@ -21,7 +21,7 @@ public class NotificationTemplate {
     @JsonProperty("subject_template")
     private String subjectTemplate;
 
-    @JsonProperty("subject_template")
+    @JsonProperty("body_template")
     private String bodyTemplate;
 
     private NotificationType type;
