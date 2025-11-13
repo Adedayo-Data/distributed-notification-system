@@ -34,4 +34,4 @@ COPY --from=dependencies /usr/src/app/node_modules ./node_modules
 EXPOSE 3001
 
 # Command to run the application
-CMD ["node", "dist/main"]
+CMD ["node", "dist/src/main"]

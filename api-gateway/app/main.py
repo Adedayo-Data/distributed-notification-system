@@ -105,15 +105,49 @@ app.include_router(auth_validation.router)
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize connections on startup"""
+    """Initialize connections on startup with retry logic"""
+    import asyncio
+    
     logger.info("Starting API Gateway Service...")
-    try:
-        await rabbitmq_publisher.connect()
-        await redis_client.connect()
-        logger.info("✓ RabbitMQ and Redis connections established")
-    except Exception as e:
-        logger.error(f"Failed to initialize connections: {str(e)}")
-        raise
+    
+    max_retries = 20
+    retry_delay = 3
+    
+    # Retry RabbitMQ connection
+    for attempt in range(1, max_retries + 1):
+        try:
+            await rabbitmq_publisher.connect()
+            logger.info("✓ RabbitMQ connection established")
+            break
+        except Exception as e:
+            if attempt < max_retries:
+                logger.warning(
+                    f"RabbitMQ not ready (attempt {attempt}/{max_retries}): {str(e)}, "
+                    f"retrying in {retry_delay}s..."
+                )
+                await asyncio.sleep(retry_delay)
+            else:
+                logger.error(f"Failed to connect to RabbitMQ after {max_retries} attempts")
+                raise
+    
+    # Retry Redis connection
+    for attempt in range(1, max_retries + 1):
+        try:
+            await redis_client.connect()
+            logger.info("✓ Redis connection established")
+            break
+        except Exception as e:
+            if attempt < max_retries:
+                logger.warning(
+                    f"Redis not ready (attempt {attempt}/{max_retries}): {str(e)}, "
+                    f"retrying in {retry_delay}s..."
+                )
+                await asyncio.sleep(retry_delay)
+            else:
+                logger.error(f"Failed to connect to Redis after {max_retries} attempts")
+                raise
+    
+    logger.info("✓ All connections established successfully")
 
 @app.on_event("shutdown")
 async def shutdown_event():
