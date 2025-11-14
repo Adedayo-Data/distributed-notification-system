@@ -18,8 +18,8 @@ public class FirebaseConfig {
 
     private static Logger logger = LoggerFactory.getLogger(FirebaseConfig.class);
 
-    @Value("classpath:firebase-service-account.json")
-    private Resource serviceAccountResource;
+    @Value("${firebase.service.account.path:/etc/secrets/firebase-service-account.json}")
+    private String serviceAccountPath;
 
     @Bean
     public FirebaseApp initializeFirebaseApp() throws IOException {
