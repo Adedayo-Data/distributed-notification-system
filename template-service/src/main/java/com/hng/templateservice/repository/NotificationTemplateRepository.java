@@ -3,6 +3,7 @@ package com.hng.templateservice.repository;
 import com.hng.templateservice.models.NotificationTemplate;
 import com.hng.templateservice.models.NotificationType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -12,6 +13,9 @@ import java.util.UUID;
 public interface NotificationTemplateRepository extends JpaRepository<NotificationTemplate, UUID> {
 
     NotificationTemplate findByTemplateKey(String templateKey);
+
+    @Query(value = "SELECT * FROM notification_template WHERE template_key = ?1", nativeQuery = true)
+    Optional<NotificationTemplate> optFindByTemplateKey(String templateKey);
 
     Optional<NotificationTemplate> findByTemplateKeyAndType(String templateKey, NotificationType type);
 }

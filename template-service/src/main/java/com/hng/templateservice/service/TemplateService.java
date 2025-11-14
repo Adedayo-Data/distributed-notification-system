@@ -20,6 +20,8 @@ public class TemplateService {
         template.setTemplateKey(tempReq.getTemplateKey());
         template.setSubjectTemplate(tempReq.getSubjectTemplate());
         template.setBodyTemplate(tempReq.getBodyTemplate());
+        template.setImageUrl(tempReq.getImageUrl());
+        template.setActionLink(tempReq.getActionLink());
         template.setType(tempReq.getType());
         template.setVersion(tempReq.getVersion());
 

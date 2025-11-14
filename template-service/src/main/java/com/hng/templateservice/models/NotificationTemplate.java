@@ -7,6 +7,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Entity
+@Table(name = "notification_template")
 @Data
 public class NotificationTemplate {
 
@@ -24,7 +25,13 @@ public class NotificationTemplate {
     @JsonProperty("body_template")
     private String bodyTemplate;
 
-    private NotificationType type;
+    @JsonProperty("image_url")    
+    private String imageUrl;
+
+    @JsonProperty("action_link")
+    private String actionLink;
+    
+    private String type;
     private Integer version;
 }
 
