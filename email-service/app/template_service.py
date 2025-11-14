@@ -1,33 +1,43 @@
-import json
 import logging
 import os
 from typing import Dict
 
 import httpx
-
-import logging
 from dotenv import load_dotenv
+
+from .models import ApiResponse, TemplateRenderRequest, TemplateRenderResult
+
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-TEMPLATE_SERVICE_URL = os.getenv("TEMPLATE_SERVICE_URL", "http://template-service:8085")
+TEMPLATE_SERVICE_URL = os.getenv("TEMPLATE_SERVICE_URL", "http://template-service:8085").rstrip("/")
 
-async def fetch_template(template_id: str, variables: dict):
-    # Replace with real template service API call
+
+async def render_template(
+    template_code: str,
+    variables: Dict[str, str],
+    notification_type: str,
+) -> TemplateRenderResult:
+    """Call the template service to render a template for email notifications."""
+    payload = TemplateRenderRequest(
+        template_code=template_code,
+        notification_type=notification_type,
+        variables=variables,
+    )
+
+    url = f"{TEMPLATE_SERVICE_URL}/api/v1/templates/render"
     try:
-        response = await httpx.get(f"{TEMPLATE_SERVICE_URL}/templates/{template_id}")
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, json=payload.dict(by_alias=True))
         response.raise_for_status()
-        data = response.json()
-        template_str = data.get("template")
-        if not template_str:
-            logger.error(f"Template {template_id} not found")
-            raise Exception("Template not found")
-        # template_str = response.json().get("template", "")
-        template_str = template_str.format(**variables)
-        return {
-            "subject": "Notification",
-            "content": template_str
-        }
-    except httpx.HTTPError as e:
-        logger.error(f"Error fetching template {template_id}: {e}")
-        raise Exception(f"Failed to fetch template: {e}")
+    except httpx.HTTPError as exc:
+        logger.error("Failed to reach template service: %s", exc)
+        raise
+
+    api_response = ApiResponse(**response.json())
+    if not api_response.success or api_response.data is None:
+        error_message = api_response.error or "Template rendering failed"
+        logger.error("Template %s rendering failed: %s", template_code, error_message)
+        raise RuntimeError(error_message)
+
+    return TemplateRenderResult(**api_response.data)
