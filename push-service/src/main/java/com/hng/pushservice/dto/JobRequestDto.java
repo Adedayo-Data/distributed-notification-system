@@ -17,5 +17,5 @@ public class JobRequestDto {
     @JsonProperty("template_code")
     private String templateCode;
 
-    private Map<String, Object> variables;
+    private Map<String, String> variables;
 }

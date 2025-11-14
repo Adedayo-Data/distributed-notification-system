@@ -4,10 +4,16 @@ import lombok.Data;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Data
 public class RenderRequestDto {
 
-    private NotificationType notificationType;
+    @JsonProperty("notification_type")
+    private String notificationType;
+
+    @JsonProperty("template_code")
     private String templateKey;
-    private Map<String, Object> variables;
+    
+    private Map<String, String> variables;
 }
