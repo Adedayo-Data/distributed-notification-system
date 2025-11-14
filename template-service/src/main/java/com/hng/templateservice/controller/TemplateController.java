@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @RestController
 @RequestMapping("/api/v1/templates")
@@ -19,6 +22,7 @@ public class TemplateController {
 
     private final TemplateService templateService;
     private final TemplateRenderService renderService;
+    private final Logger logger = LoggerFactory.getLogger(TemplateController.class);
 
     @PostMapping
     public ResponseEntity<NotificationTemplate> createTemplate(@RequestBody NotificationRequestdto req){
@@ -53,26 +57,26 @@ public class TemplateController {
     }
 
     @PostMapping("/render")
-    public ResponseEntity<ApiResponseDto<?>> renderTemplate(@RequestBody RenderRequestDto request) {
+public ResponseEntity<ApiResponseDto<?>> renderTemplate(@RequestBody RenderRequestDto request) {
+    logger.info("Received render request for template key: {}", request.getTemplateKey());
+    try {
+        // 1. Try to render the template
+        RenderResponseDto renderedData = renderService.renderTemplate(request);
+        logger.info("Template rendered successfully for key: {}", request.getTemplateKey());
 
-        try {
-            // 1. Try to render the template
-            RenderResponseDto renderedData = renderService.renderTemplate(request);
+        // 2. Use the .success() method
+        ApiResponseDto<RenderResponseDto> response = ApiResponseDto.success(
+                "Template rendered successfully", renderedData, null);
 
-            // 2. Wrap in a SUCCESS response (meta is null, as we discussed)
-            ApiResponseDto<RenderResponseDto> response =
-                    new ApiResponseDto<>(true, "Template rendered successfully", renderedData, null);
+        logger.info("Response: {}", response); // This will now show success=true
+        return ResponseEntity.ok(response);
 
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            // 3. Wrap in a FAILURE response
-            ApiResponseDto<Object> errorResponse =
-                    new ApiResponseDto<>(false, "Template rendering failed", e.getMessage(), null);
-
-            // Return 404 if not found, 400 for bad request, etc.
-            // For now, 400 is a good general error.
-            return ResponseEntity.status(400).body(errorResponse);
-        }
+    } catch (Exception e) {
+        // 3. Use the .fail() method
+        ApiResponseDto<Object> errorResponse = ApiResponseDto.fail(
+                "Template rendering failed", e.getMessage(), null);
+        
+        return ResponseEntity.status(400).body(errorResponse);
     }
+}
 }
