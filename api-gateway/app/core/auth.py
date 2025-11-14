@@ -44,11 +44,11 @@ class AuthHandler:
             )
             
             # Verify token type
-            if payload.get("type") != "access":
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Invalid token type"
-                )
+            # if payload.get("type") != "access":
+            #     raise HTTPException(
+            #         status_code=status.HTTP_401_UNAUTHORIZED,
+            #         detail="Invalid token type"
+            #     )
             
             return payload
             

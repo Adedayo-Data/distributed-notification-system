@@ -42,7 +42,7 @@ async def create_template(request: TemplateCreationRequest,
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 template_service_url,
-                json=request.dict() # Convert Pydantic model to dict for JSON body
+                json=request.model_dump(by_alias=True) # Convert Pydantic model to dict for JSON body
             )
         
         response.raise_for_status() # Raise error for 4xx/5xx responses

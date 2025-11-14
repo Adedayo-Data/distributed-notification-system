@@ -4,9 +4,16 @@ from typing import Optional
 
 # You need to define this DTO based on the JSON templates we made before
 class TemplateCreationRequest(BaseModel):
-    template_key: str = Field(..., alias="templateKey") # Maps JSON snake to internal camel
+    # CRITICAL FIX: Maps incoming camelCase keys to internal snake_case attributes
+    # The 'alias' is what the client sends (templateKey)
+    # The internal name is what the Java service expects (template_code)
+    template_code: str = Field(..., alias="templateKey") 
     subject_template: str = Field(..., alias="subjectTemplate")
     body_template: str = Field(..., alias="bodyTemplate")
     type: str
     version: int
-    # Ensure any optional fields (like rendered_image_url) are added here if the underlying service uses them.
+
+    class Config:
+        populate_by_name = True
+        # NEW: Ensure Pydantic uses the ALIASES/OUTPUT NAMES when serializing (model_dump)
+        by_alias = True

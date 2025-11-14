@@ -43,6 +43,9 @@ async def send_email_async(sg, message):
 
 async def send_email_with_retries(to_email, subject, content, original_data, rabbitmq_url):
     """Send email with retry logic and DLQ fallback."""
+    if not FROM_EMAIL or not SENDGRID_API_KEY:
+        raise RuntimeError("SendGrid configuration missing")
+
     sg = SendGridAPIClient(SENDGRID_API_KEY)
     message = Mail(
         from_email=FROM_EMAIL,
