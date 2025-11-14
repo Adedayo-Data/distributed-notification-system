@@ -93,6 +93,10 @@ services:
       - DB_PASSWORD=password
       - DB_DATABASE=user_db
       - JWT_SECRET=${JWT_SECRET}
+
+    # volumes:
+    #   - ./user-service:/usr/src/app
+
     depends_on:
       - postgres
 
@@ -107,6 +111,9 @@ services:
       - SERVICE_PORT=8085
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/template_db
       - SPRING_DATASOURCE_PASSWORD=password
+
+    volumes:
+      - ./template-service/src:/app/src
     depends_on:
       - postgres
 
@@ -121,6 +128,10 @@ services:
       - USER_SERVICE_URL=http://user-service:3001
       - TEMPLATE_SERVICE_URL=http://template-service:8085
       - STATUS_UPDATE_URL=http://api-gateway:8000/api/v1/push/status/
+
+    volumes:
+      - ./push-service/src:/app/src
+
     depends_on:
       - rabbitmq
       - redis
